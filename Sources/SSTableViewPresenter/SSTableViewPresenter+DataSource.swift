@@ -65,4 +65,16 @@ extension SSTableViewPresenter: UITableViewDataSource {
 
         return cell
     }
+
+    public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+        guard let viewModel = viewModel, viewModel.isIndexTitlesEnabled else { return nil }
+        return cachedIndexTitles.isEmpty ? nil : cachedIndexTitles
+    }
+
+    public func tableView(_ tableView: UITableView,
+                          sectionForSectionIndexTitle title: String,
+                          at index: Int) -> Int {
+        guard cachedIndexTitleSections.indices.contains(index) else { return 0 }
+        return cachedIndexTitleSections[index]
+    }
 }

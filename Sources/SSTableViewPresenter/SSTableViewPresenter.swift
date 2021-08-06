@@ -36,6 +36,15 @@ public final class SSTableViewPresenter: NSObject {
                 }
             }
             isLoadingNextPage = false
+
+            if viewModel.isIndexTitlesEnabled {
+                let map = viewModel.buildIndexTitleMap()
+                cachedIndexTitles = map.titles
+                cachedIndexTitleSections = map.sections
+            } else {
+                cachedIndexTitles.removeAll()
+                cachedIndexTitleSections.removeAll()
+            }
         }
     }
 
@@ -59,6 +68,12 @@ public final class SSTableViewPresenter: NSObject {
 
     /// Closure called when prefetching should be cancelled.
     internal var cancelPrefetchBlock: (([CellInfo]) -> Void)?
+
+    // MARK: - Index Title Cache
+
+    /// Cached index title map, rebuilt whenever the view model changes.
+    internal var cachedIndexTitles: [String] = []
+    internal var cachedIndexTitleSections: [Int] = []
 
     // MARK: - Table View Reference
 

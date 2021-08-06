@@ -34,6 +34,12 @@ public struct SSTableViewModel: RandomAccessCollection, RangeReplaceableCollecti
         sections.flatMap { $0.rows.filter { $0.isSelected } }
     }
 
+    /// Whether to display index titles (section index bar) in the table view.
+    ///
+    /// When `true`, the presenter returns index titles from sections that have
+    /// a non-nil `indexTitle` property.
+    public var isIndexTitlesEnabled: Bool = false
+
     // MARK: - Page Map
 
     /// The current page number for paginated API requests.
@@ -58,10 +64,11 @@ public struct SSTableViewModel: RandomAccessCollection, RangeReplaceableCollecti
     public var hasPageData: Bool { !pageMap.isEmpty }
 
     // MARK: - Init.
-    public init(sections: [SectionInfo] = [], page: Int = 0, hasNext: Bool = false) {
+    public init(sections: [SectionInfo] = [], page: Int = 0, hasNext: Bool = false, isIndexTitlesEnabled: Bool = false) {
         self.sections = sections
         self.page = page
         self.hasNext = hasNext
+        self.isIndexTitlesEnabled = isIndexTitlesEnabled
     }
 
     public init() {
@@ -72,6 +79,27 @@ public struct SSTableViewModel: RandomAccessCollection, RangeReplaceableCollecti
     public func sectionInfo(at index: Int) -> SectionInfo? {
         guard sections.indices.contains(index) else { return nil }
         return sections[index]
+    }
+
+    // MARK: - Index Titles
+
+    /// Builds a pair of (titles, sections) arrays aligned by position.
+    ///
+    /// Titles are deduplicated and ordered by first appearance.
+    /// Each entry in `sections` is the index of the first section whose
+    /// `indexTitle` matches the corresponding title.
+    internal func buildIndexTitleMap() -> (titles: [String], sections: [Int]) {
+        var seen = Set<String>()
+        var titles: [String] = []
+        var sectionIndexes: [Int] = []
+        for (sectionIndex, section) in sections.enumerated() {
+            guard let title = section.indexTitle else { continue }
+            if seen.insert(title).inserted {
+                titles.append(title)
+                sectionIndexes.append(sectionIndex)
+            }
+        }
+        return (titles, sectionIndexes)
     }
 
     // MARK: - Page Management

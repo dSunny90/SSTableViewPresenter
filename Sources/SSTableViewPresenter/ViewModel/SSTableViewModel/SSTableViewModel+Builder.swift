@@ -45,6 +45,7 @@ extension SSTableViewModel {
         private var currentRows: [CellInfo] = []
         private var currentHeader: HeaderFooterViewInfo?
         private var currentFooter: HeaderFooterViewInfo?
+        private var currentIndexTitle: String?
         private var currentSectionID: String = UUID().uuidString
         private var hasOpenSection: Bool = false
 
@@ -60,12 +61,21 @@ extension SSTableViewModel {
             currentRows.removeAll(keepingCapacity: true)
             currentHeader = nil
             currentFooter = nil
+            currentIndexTitle = nil
             hasOpenSection = true
 
             if let content = content {
                 content()
                 closeCurrentSectionIfNeeded()
             }
+            return self
+        }
+
+        /// Sets the index title for the currently open section.
+        @discardableResult
+        public func indexTitle(_ value: String) -> Self {
+            ensureSectionIfNeeded()
+            currentIndexTitle = value
             return self
         }
 
@@ -129,9 +139,9 @@ extension SSTableViewModel {
         }
 
         /// Finalizes and returns the built model.
-        public func build(page: Int = 0, hasNext: Bool = false) -> SSTableViewModel {
+        public func build(page: Int = 0, hasNext: Bool = false, isIndexTitlesEnabled: Bool = false) -> SSTableViewModel {
             closeCurrentSectionIfNeeded()
-            return SSTableViewModel(sections: sections, page: page, hasNext: hasNext)
+            return SSTableViewModel(sections: sections, page: page, hasNext: hasNext, isIndexTitlesEnabled: isIndexTitlesEnabled)
         }
 
         // MARK: - Private helpers
@@ -145,12 +155,13 @@ extension SSTableViewModel {
 
         private func closeCurrentSectionIfNeeded() {
             guard hasOpenSection else { return }
-            let section = SectionInfo(
+            var section = SectionInfo(
                 rows: currentRows,
                 header: currentHeader,
                 footer: currentFooter,
                 identifier: currentSectionID
             )
+            section.indexTitle = currentIndexTitle
             sections.append(section)
             // Reset working state
             currentRows.removeAll(keepingCapacity: true)

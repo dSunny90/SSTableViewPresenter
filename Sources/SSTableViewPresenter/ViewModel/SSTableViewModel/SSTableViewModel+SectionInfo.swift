@@ -31,6 +31,13 @@ extension SSTableViewModel {
         /// data source reflects the updated state during the animation.
         public var isCollapsed: Bool = false
 
+        /// An optional index title string for this section.
+        ///
+        /// When set, this value is used by `sectionIndexTitles(for:)` to build
+        /// the section index bar on the right side of the table view.
+        /// Only effective when `SSTableViewModel.isIndexTitlesEnabled` is `true`
+        public var indexTitle: String?
+
         // MARK: - RandomAccessCollection
 
         public typealias Index = Int
@@ -44,11 +51,13 @@ extension SSTableViewModel {
             rows: [CellInfo] = [],
             header: HeaderFooterViewInfo? = nil,
             footer: HeaderFooterViewInfo? = nil,
+            indexTitle: String? = nil,
             identifier: String? = nil
         ) {
             self.rows = rows
             self.header = header
             self.footer = footer
+            self.indexTitle = indexTitle
             self.identifier = identifier
         }
 
