@@ -171,4 +171,101 @@ extension SSTableViewPresenter: UITableViewDelegate {
 
         row.didDeselect(to: cell)
     }
+
+    @available(iOS 11.0, *)
+    public func tableView(_ tableView: UITableView,
+                          leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let row = viewModel?[indexPath.section][indexPath.row],
+              let swipeConfig = row.leadingSwipeActions?(row)
+        else { return nil }
+
+        let contextualActions = swipeConfig.actions.map { action in
+            let element = UIContextualAction(style: action.style, title: action.title) { [weak self] _, _, completion in
+                guard let self = self else { completion(false); return }
+
+                let result = action.handler(row)
+
+                switch result {
+                case .delete:
+                    if var newViewModel = self.viewModel {
+                        newViewModel[indexPath.section].remove(at: indexPath.row)
+                        self.viewModel = newViewModel
+                        tableView.deleteRows(at: [indexPath], with: .automatic)
+                    }
+                case .update(let newCellInfo):
+                    if var newViewModel = self.viewModel {
+                        newViewModel[indexPath.section][indexPath.row] = newCellInfo
+                        self.viewModel = newViewModel
+                        tableView.reloadRows(at: [indexPath], with: .none)
+                    }
+                case .reload:
+                    tableView.reloadData()
+                case .none:
+                    break
+                }
+
+                completion(true)
+            }
+
+            if let bgColor = action.backgroundColor {
+                element.backgroundColor = bgColor
+            }
+            if let image = action.image {
+                element.image = image
+            }
+            return element
+        }
+        let config = UISwipeActionsConfiguration(actions: contextualActions)
+        config.performsFirstActionWithFullSwipe = swipeConfig.performsFirstActionWithFullSwipe
+        return config
+    }
+
+    @available(iOS 11.0, *)
+    public func tableView(_ tableView: UITableView,
+                          trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let row = viewModel?[indexPath.section][indexPath.row],
+              let swipeConfig = row.trailingSwipeActions?(row)
+        else { return nil }
+
+        let contextualActions = swipeConfig.actions.map { action in
+            let element = UIContextualAction(style: action.style, title: action.title) { [weak self] _, _, completion in
+                guard let self = self else { completion(false); return }
+
+                let result = action.handler(row)
+
+                switch result {
+                case .delete:
+                    if var newViewModel = self.viewModel {
+                        newViewModel[indexPath.section].remove(at: indexPath.row)
+                        self.viewModel = newViewModel
+                        tableView.deleteRows(at: [indexPath], with: .automatic)
+                    }
+                case .update(let newCellInfo):
+                    if var newViewModel = self.viewModel {
+                        newViewModel[indexPath.section][indexPath.row] = newCellInfo
+                        self.viewModel = newViewModel
+                        tableView.reloadRows(at: [indexPath], with: .none)
+                    }
+                case .reload:
+                    tableView.reloadData()
+                case .none:
+                    break
+                }
+
+                completion(true)
+            }
+
+            if let bgColor = action.backgroundColor {
+                element.backgroundColor = bgColor
+            }
+            if let image = action.image {
+                element.image = image
+            }
+            return element
+        }
+        let config = UISwipeActionsConfiguration(actions: contextualActions)
+        config.performsFirstActionWithFullSwipe = swipeConfig.performsFirstActionWithFullSwipe
+        return config
+    }
+
 }

@@ -38,6 +38,7 @@ extension SSTableViewModel {
     public final class Builder {
         public typealias HeaderFooterViewActionClosure = ((Int, UITableViewHeaderFooterView, String, Any?) -> Void)
         public typealias CellActionClosure = ((IndexPath, UITableViewCell, String, Any?) -> Void)
+        public typealias SwipeActionClosure = ((CellInfo) -> CellInfo.SwipeConfiguration)
 
         private var sections: [SectionInfo] = []
 
@@ -83,13 +84,17 @@ extension SSTableViewModel {
         public func cell<T, V>(
             _ model: T,
             cellType: V.Type,
-            actionClosure: CellActionClosure? = nil
+            actionClosure: CellActionClosure? = nil,
+            leadingSwipeActions: SwipeActionClosure? = nil,
+            trailingSwipeActions: SwipeActionClosure? = nil
         )
             where V: SSTableViewCellProtocol, V.Input == T
         {
             ensureSectionIfNeeded()
             let cell = CellInfo(BindingStore<T, V>(state: model))
             cell.actionClosure = actionClosure
+            cell.leadingSwipeActions = leadingSwipeActions
+            cell.trailingSwipeActions = trailingSwipeActions
             currentRows.append(cell)
         }
 
@@ -97,7 +102,9 @@ extension SSTableViewModel {
         public func cells<S: Sequence, V>(
             _ models: S,
             cellType: V.Type,
-            actionClosure: CellActionClosure? = nil
+            actionClosure: CellActionClosure? = nil,
+            leadingSwipeActions: SwipeActionClosure? = nil,
+            trailingSwipeActions: SwipeActionClosure? = nil
         )
             where V: SSTableViewCellProtocol, V.Input == S.Element
         {
@@ -105,6 +112,8 @@ extension SSTableViewModel {
             let rows = models.map { model -> CellInfo in
                 let cell = CellInfo(BindingStore<S.Element, V>(state: model))
                 cell.actionClosure = actionClosure
+                cell.leadingSwipeActions = leadingSwipeActions
+                cell.trailingSwipeActions = trailingSwipeActions
                 return cell
             }
             currentRows.append(contentsOf: rows)

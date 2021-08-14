@@ -13,6 +13,57 @@ extension SSTableViewModel {
     /// used by `SSTableViewPresenter` to configure and render cells
     /// in the table view.
     public final class CellInfo: AnyBindingStore {
+        /// Swipe action shown on leading/trailing side of a row.
+        public struct SwipeAction {
+            /// Visual style (.normal / .destructive).
+            let style: UIContextualAction.Style
+            /// Button title (nil = icon-only if you set an image elsewhere).
+            let title: String?
+            /// Optional background color override.
+            let backgroundColor: UIColor?
+            /// Optional image override.
+            let image: UIImage?
+            /// Called when the action is triggered; return how the row should update.
+            let handler: (CellInfo) -> SwipeActionResult
+
+            public init(style: UIContextualAction.Style,
+                        title: String? = nil,
+                        backgroundColor: UIColor? = nil,
+                        image: UIImage? = nil,
+                        handler: @escaping (CellInfo) -> SwipeActionResult) {
+                self.style = style
+                self.title = title
+                self.backgroundColor = backgroundColor
+                self.image = image
+                self.handler = handler
+            }
+        }
+
+        /// Configuration for swipe actions in table view cells
+        public struct SwipeConfiguration {
+            /// Array of swipe actions to display
+            let actions: [SwipeAction]
+            /// Whether a full swipe performs the first action automatically
+            let performsFirstActionWithFullSwipe: Bool
+
+            public init(actions: [SwipeAction], performsFirstActionWithFullSwipe: Bool = true) {
+                self.actions = actions
+                self.performsFirstActionWithFullSwipe = performsFirstActionWithFullSwipe
+            }
+        }
+
+        /// Outcome of a swipe action.
+        public enum SwipeActionResult {
+            /// Remove the row from the data source.
+            case delete
+            /// Replace the row with an updated `CellInfo`.
+            case update(CellInfo)
+            /// Reload the row in place (no identity change).
+            case reload
+            /// No UI/model change.
+            case none
+        }
+
         /// Whether the cell is currently highlighted (touch-down state)
         public var isHighlighted: Bool = false
 
@@ -27,6 +78,12 @@ extension SSTableViewModel {
         ///   - actionName: A string identifying the type of action.
         ///   - input: An optional value passed by the caller for the action.
         public var actionClosure: ((IndexPath, UITableViewCell, String, Any?) -> Void)?
+
+        /// Closure that returns leading swipe configuration for a cell
+        public var leadingSwipeActions: ((CellInfo) -> SwipeConfiguration)?
+
+        /// Closure that returns trailing swipe configuration for a cell
+        public var trailingSwipeActions: ((CellInfo) -> SwipeConfiguration)?
 
         private let _didHighlightBlock: (Any) -> Void
         private let _didUnhighlightBlock: (Any) -> Void
