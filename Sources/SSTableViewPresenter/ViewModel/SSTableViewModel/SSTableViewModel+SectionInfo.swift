@@ -23,6 +23,8 @@ extension SSTableViewModel {
         internal var rows: [CellInfo]
         internal var header: HeaderFooterViewInfo?
         internal var footer: HeaderFooterViewInfo?
+        internal var headerTitle: String?
+        internal var footerTitle: String?
 
         /// A Boolean value indicating whether the section is collapsed.
         ///
@@ -51,12 +53,16 @@ extension SSTableViewModel {
             rows: [CellInfo] = [],
             header: HeaderFooterViewInfo? = nil,
             footer: HeaderFooterViewInfo? = nil,
+            headerTitle: String? = nil,
+            footerTitle: String? = nil,
             indexTitle: String? = nil,
             identifier: String? = nil
         ) {
             self.rows = rows
             self.header = header
             self.footer = footer
+            self.headerTitle = headerTitle
+            self.footerTitle = footerTitle
             self.indexTitle = indexTitle
             self.identifier = identifier
         }

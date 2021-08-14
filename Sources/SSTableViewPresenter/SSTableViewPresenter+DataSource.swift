@@ -66,6 +66,20 @@ extension SSTableViewPresenter: UITableViewDataSource {
         return cell
     }
 
+    public func tableView(_ tableView: UITableView,
+                          titleForHeaderInSection section: Int) -> String? {
+        guard let headerTitle = viewModel?.sections[section].headerTitle else { return nil }
+
+        return headerTitle
+    }
+
+    public func tableView(_ tableView: UITableView,
+                          titleForFooterInSection section: Int) -> String? {
+        guard let footerTitle = viewModel?.sections[section].footerTitle else { return nil }
+
+        return footerTitle
+    }
+
     public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
         guard let viewModel = viewModel, viewModel.isIndexTitlesEnabled else { return nil }
         return cachedIndexTitles.isEmpty ? nil : cachedIndexTitles
