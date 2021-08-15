@@ -255,6 +255,16 @@ extension SendingState where Base: UITableView {
         base.presenter?.cancelPrefetchBlock = block
     }
 
+    // MARK: - Row Insertion
+
+    /// Sets a provider used to create a new cell model for row insertion.
+    ///
+    /// - Parameter block: A closure that receives the target `IndexPath` and
+    ///                    returns the `CellInfo` to insert.
+    public func setNewCellInfoProvider(_ block: @escaping (IndexPath) -> CellInfo) {
+        base.presenter?.newCellInfoProvider = block
+    }
+
     // MARK: - Page-Based Loading
 
     /// Loads a page of data into the view model's page map and

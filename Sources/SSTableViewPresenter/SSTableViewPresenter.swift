@@ -75,6 +75,9 @@ public final class SSTableViewPresenter: NSObject {
     internal var cachedIndexTitles: [String] = []
     internal var cachedIndexTitleSections: [Int] = []
 
+    // MARK: - Row Insertion
+    internal var newCellInfoProvider: ((IndexPath) -> CellInfo)?
+
     // MARK: - Table View Reference
 
     /// The table view being managed by this presenter.

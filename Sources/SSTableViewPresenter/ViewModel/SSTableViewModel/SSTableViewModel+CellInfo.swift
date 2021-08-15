@@ -70,6 +70,12 @@ extension SSTableViewModel {
         /// Whether the cell is currently selected
         public var isSelected: Bool = false
 
+        /// Enables row editing behaviors (e.g., swipe actions).
+        public var canEditRow: Bool = true
+
+        /// Allows the row to be reordered/moved.
+        public var canMoveRow: Bool = true
+
         /// A closure invoked when the bound cell sends an action.
         ///
         /// - Parameters:
