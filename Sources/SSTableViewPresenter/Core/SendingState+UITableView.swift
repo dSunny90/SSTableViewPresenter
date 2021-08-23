@@ -29,13 +29,18 @@ extension SendingState where Base: UITableView {
 
     /// Sets up the presenter for the table view
     ///
-    /// - Parameter actionHandler: An optional handler for user interactions.
+    /// - Parameters:
+    ///   - actionHandler: Optional handler for user interactions.
+    ///   - dataSourceMode: Data mode (`.traditional`, `.diffable`).
+    ///                     Default is `.traditional`.
     public func setupPresenter(
-        actionHandler: (any ActionHandlingProvider)? = nil
+        actionHandler: (any ActionHandlingProvider)? = nil,
+        dataSourceMode: SSTableViewPresenter.DataSourceMode = .traditional
     ) {
         base.presenter = SSTableViewPresenter(
             tableView: base,
-            actionHandler: actionHandler
+            actionHandler: actionHandler,
+            dataSourceMode: dataSourceMode
         )
     }
 
@@ -253,6 +258,18 @@ extension SendingState where Base: UITableView {
     @available(iOS 10.0, *)
     public func onCancelPrefetch(_ block: @escaping ([CellInfo]) -> Void) {
         base.presenter?.cancelPrefetchBlock = block
+    }
+
+    // MARK: - Snapshot Application (iOS 13+)
+
+    /// Applies the current diffable data source snapshot.
+    ///
+    /// Only applies when using the `.diffable` data source mode.
+    ///
+    /// - Parameter animated: Whether to animate the changes. Default is `true`.
+    @available(iOS 13.0, *)
+    public func applySnapshot(animated: Bool = true) {
+        base.presenter?.applySnapshot(animated: animated)
     }
 
     // MARK: - Row Insertion

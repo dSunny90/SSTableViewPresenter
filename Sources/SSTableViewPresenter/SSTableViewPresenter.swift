@@ -18,6 +18,11 @@ public final class SSTableViewPresenter: NSObject {
     typealias CellInfo = SSTableViewModel.CellInfo
     typealias HeaderFooterViewInfo = SSTableViewModel.HeaderFooterViewInfo
 
+    // MARK: - Configuration
+
+    /// The data source mode (diffable or classic).
+    internal let dataSourceMode: DataSourceMode
+
     // MARK: - ViewModel
 
     /// The current view model backing the table view.
@@ -36,6 +41,12 @@ public final class SSTableViewPresenter: NSObject {
                 }
             }
             isLoadingNextPage = false
+
+            if #available(iOS 13.0, *) {
+                if dataSourceMode == .diffable {
+                    diffableSupportCore?.updateSnapshot(with: viewModel)
+                }
+            }
 
             if viewModel.isIndexTitlesEnabled {
                 let map = viewModel.buildIndexTitleMap()
@@ -75,6 +86,20 @@ public final class SSTableViewPresenter: NSObject {
     internal var cachedIndexTitles: [String] = []
     internal var cachedIndexTitleSections: [Int] = []
 
+    // MARK: - Diffable Data Source Support
+
+    @available(iOS 13.0, *)
+    private var diffableSupportCore: DiffableSupportCore? {
+        get {
+            _diffableSupportCore as? DiffableSupportCore
+        }
+        set {
+            _diffableSupportCore = newValue
+        }
+    }
+
+    private var _diffableSupportCore: Any?
+
     // MARK: - Row Insertion
     internal var newCellInfoProvider: ((IndexPath) -> CellInfo)?
 
@@ -87,14 +112,16 @@ public final class SSTableViewPresenter: NSObject {
 
     public init(
         tableView: UITableView,
-        actionHandler: ActionHandlingProvider? = nil
+        actionHandler: ActionHandlingProvider? = nil,
+        dataSourceMode: DataSourceMode = .traditional
     ) {
         self.tableView = tableView
         if let actionHandler = actionHandler {
             self.actionHandler = AnyActionHandlingProvider(actionHandler)
         }
+        self.dataSourceMode = dataSourceMode
         super.init()
-        tableView.dataSource = self
+        configureDataSource()
         tableView.delegate = self
         tableView.prefetchDataSource = self
         tableView.registerDefaultCell()
@@ -250,6 +277,30 @@ public final class SSTableViewPresenter: NSObject {
         }
     }
 
+    // MARK: - Configuration
+
+    /// Configures the data source for the table view.
+    ///
+    /// Sets up either traditional data source callbacks or a diffable data source
+    /// based on the specified mode.
+    private func configureDataSource() {
+        guard let tableView = tableView else { return }
+        switch dataSourceMode {
+        case .traditional:
+            tableView.dataSource = self
+        case .diffable:
+            if #available(iOS 13.0, *) {
+                self.diffableSupportCore = DiffableSupportCore()
+                self.diffableSupportCore?.configureDiffableDataSource(
+                    in: tableView,
+                    anyActionHandler: actionHandler
+                )
+            } else {
+                assertionFailure("Diffable is not supported below iOS 13.")
+            }
+        }
+    }
+
     // MARK: - Pagination
 
     /// Determines whether the next page should be loaded based on scroll position.
@@ -264,5 +315,19 @@ public final class SSTableViewPresenter: NSObject {
         else { return false }
 
         return (tableView.contentOffset.y > tableView.contentSize.height - tableView.bounds.height * 3)
+    }
+
+    // MARK: - Presentation
+
+    /// Applies the current snapshot to the diffable data source.
+    ///
+    /// Only applies when using the `.diffable` data source mode. Has no effect
+    /// in traditional mode.
+    ///
+    /// - Parameter animated: Whether to animate the changes.
+    @available(iOS 13.0, *)
+    internal func applySnapshot(animated: Bool) {
+        guard dataSourceMode == .diffable else { return }
+        diffableSupportCore?.applySnapshot(animated: animated)
     }
 }
