@@ -272,6 +272,66 @@ extension SendingState where Base: UITableView {
         base.presenter?.applySnapshot(animated: animated)
     }
 
+    // MARK: - Reconfigure Items (iOS 15+)
+
+    /// Reconfigures cells at the specified index paths without reloading them.
+    ///
+    /// This is more efficient than `reloadItems` because it updates
+    /// cell content without recreating the cell instance.
+    /// Requires `.diffable` data source mode.
+    ///
+    /// - Parameter indexPaths: The index paths of items to reconfigure.
+    @available(iOS 15.0, *)
+    public func reconfigureItems(at indexPaths: [IndexPath]) {
+        guard let viewModel = base.presenter?.viewModel else { return }
+        let items: [CellInfo] = indexPaths.compactMap {
+            guard $0.section < viewModel.count,
+                  $0.row < viewModel[$0.section].count else { return nil }
+            return viewModel[$0.section][$0.row]
+        }
+        base.presenter?.reconfigureItems(items)
+    }
+
+    /// Reconfigures cells at the specified index paths without reloading them.
+    ///
+    /// This is more efficient than `reloadItems` because it updates
+    /// cell content without recreating the cell instance.
+    /// Requires `.diffable` data source mode.
+    ///
+    /// - Parameter indexPaths: The index paths of items to reconfigure.
+    @available(iOS 15.0, *)
+    public func reconfigureItems(identifiers: [String]) {
+        guard let viewModel = base.presenter?.viewModel else { return }
+        let identifierSet = Set(identifiers)
+        let items: [CellInfo] = viewModel.flatMap { $0 }.filter {
+            guard let id = $0.identifier else { return false }
+            return identifierSet.contains(id)
+        }
+        base.presenter?.reconfigureItems(items)
+    }
+
+    /// Reconfigures all visible cells.
+    ///
+    /// Requires `.diffable` data source mode.
+    @available(iOS 15.0, *)
+    public func reconfigureVisibleRows() {
+        guard let visibleRows = base.indexPathsForVisibleRows,
+              visibleRows.isEmpty == false else { return }
+        reconfigureItems(at: visibleRows)
+    }
+
+    // MARK: - Apply Snapshot Using Reload Data (iOS 15+)
+
+    /// Applies the snapshot using a full reload without diffing or animation.
+    ///
+    /// Use this for initial data loads or large batch updates where
+    /// diffing overhead is unnecessary.
+    /// Requires `.diffable` data source mode.
+    @available(iOS 15.0, *)
+    public func applySnapshotUsingReloadData() {
+        base.presenter?.applySnapshotUsingReloadData()
+    }
+
     // MARK: - Row Insertion
 
     /// Sets a provider used to create a new cell model for row insertion.

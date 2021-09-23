@@ -330,4 +330,20 @@ public final class SSTableViewPresenter: NSObject {
         guard dataSourceMode == .diffable else { return }
         diffableSupportCore?.applySnapshot(animated: animated)
     }
+
+    // MARK: - iOS 15+ Features
+
+    /// Reconfigures cells without reloading them.
+    @available(iOS 15.0, *)
+    internal func reconfigureItems(_ identifiers: [CellInfo]) {
+        guard dataSourceMode == .diffable else { return }
+        diffableSupportCore?.reconfigureItems(identifiers)
+    }
+
+    /// Applies the snapshot using a full reload without diffing.
+    @available(iOS 15.0, *)
+    internal func applySnapshotUsingReloadData() {
+        guard dataSourceMode == .diffable else { return }
+        diffableSupportCore?.applySnapshotUsingReloadData()
+    }
 }
