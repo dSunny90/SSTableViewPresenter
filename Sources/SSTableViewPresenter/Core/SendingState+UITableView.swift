@@ -284,12 +284,12 @@ extension SendingState where Base: UITableView {
     @available(iOS 15.0, *)
     public func reconfigureItems(at indexPaths: [IndexPath]) {
         guard let viewModel = base.presenter?.viewModel else { return }
-        let items: [CellInfo] = indexPaths.compactMap {
-            guard $0.section < viewModel.count,
-                  $0.row < viewModel[$0.section].count else { return nil }
-            return viewModel[$0.section][$0.row]
+        var rows = [CellInfo]()
+        for indexPath in indexPaths {
+            guard let row = viewModel[safe: indexPath.section]?[safe: indexPath.row] else { continue }
+            rows.append(row)
         }
-        base.presenter?.reconfigureItems(items)
+        base.presenter?.reconfigureItems(rows)
     }
 
     /// Reconfigures cells at the specified index paths without reloading them.
@@ -954,11 +954,9 @@ extension SendingState where Base: UITableView {
     /// - Parameter indexPath: The index path of the row.
     /// - Returns: The `CellInfo` at the index path, or `nil`.
     public func row(at indexPath: IndexPath) -> CellInfo? {
-        guard let viewModel = base.presenter?.viewModel,
-              indexPath.section < viewModel.count,
-              indexPath.row < viewModel[indexPath.section].count
+        guard let row = base.presenter?.viewModel?[safe: indexPath.section]?[safe: indexPath.row]
         else { return nil }
-        return viewModel[indexPath.section][indexPath.row]
+        return row
     }
 
     /// Returns the row at the specified row in the first section matching
@@ -971,8 +969,8 @@ extension SendingState where Base: UITableView {
     public func row(atRow row: Int, sectionIdentifier identifier: String) -> CellInfo? {
         guard let viewModel = base.presenter?.viewModel,
               let sectionIndex = viewModel.sections.firstIndex(where: { $0.identifier == identifier }),
-              row < viewModel[sectionIndex].count
+              let item = viewModel[sectionIndex][safe: row]
         else { return nil }
-        return viewModel[sectionIndex][row]
+        return item
     }
 }

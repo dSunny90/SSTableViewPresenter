@@ -22,7 +22,7 @@ extension SSTableViewPresenter: UITableViewDataSource {
 
     public func tableView(_ tableView: UITableView,
                           numberOfRowsInSection section: Int) -> Int {
-        guard let sectionInfo = viewModel?[section],
+        guard let sectionInfo = viewModel?[safe: section],
               !sectionInfo.isCollapsed else { return 0 }
 
         return sectionInfo.rows.count
@@ -33,6 +33,9 @@ extension SSTableViewPresenter: UITableViewDataSource {
         guard let viewModel = viewModel
         else { return tableView.dequeueDefaultCell(for: indexPath) }
 
+        guard let row = viewModel[safe: indexPath.section]?[safe: indexPath.row]
+        else { return tableView.dequeueDefaultCell(for: indexPath) }
+
         defer {
             if shouldLoadNextPage() {
                 isLoadingNextPage = true
@@ -40,7 +43,6 @@ extension SSTableViewPresenter: UITableViewDataSource {
             }
         }
 
-        let row = viewModel[indexPath.section].rows[indexPath.row]
         let cell = tableView.dequeueReusableCell(
             withIdentifier: String(describing: row.binderType),
             for: indexPath
@@ -68,28 +70,28 @@ extension SSTableViewPresenter: UITableViewDataSource {
 
     public func tableView(_ tableView: UITableView,
                           canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let row = viewModel?[indexPath.section][indexPath.row] else { return true }
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row] else { return true }
 
         return row.canEditRow
     }
 
     public func tableView(_ tableView: UITableView,
                           canMoveRowAt indexPath: IndexPath) -> Bool {
-        guard let row = viewModel?[indexPath.section][indexPath.row] else { return true }
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row] else { return true }
 
         return row.canMoveRow
     }
 
     public func tableView(_ tableView: UITableView,
                           titleForHeaderInSection section: Int) -> String? {
-        guard let headerTitle = viewModel?.sections[section].headerTitle else { return nil }
+        guard let headerTitle = viewModel?.sections[safe: section]?.headerTitle else { return nil }
 
         return headerTitle
     }
 
     public func tableView(_ tableView: UITableView,
                           titleForFooterInSection section: Int) -> String? {
-        guard let footerTitle = viewModel?.sections[section].footerTitle else { return nil }
+        guard let footerTitle = viewModel?.sections[safe: section]?.footerTitle else { return nil }
 
         return footerTitle
     }

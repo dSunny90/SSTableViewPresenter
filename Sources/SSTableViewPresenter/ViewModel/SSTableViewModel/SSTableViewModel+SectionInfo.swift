@@ -73,8 +73,8 @@ extension SSTableViewModel {
 
         /// Get a cell info at the specified index.
         public func cellInfo(at index: Int) -> CellInfo? {
-            guard rows.indices.contains(index) else { return nil }
-            return rows[index]
+            guard let cellInfo = rows[safe: index] else { return nil }
+            return cellInfo
         }
 
         /// Get a header info at the specified index.

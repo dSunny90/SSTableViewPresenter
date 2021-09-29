@@ -12,7 +12,7 @@ import UIKit
 extension SSTableViewPresenter: UITableViewDelegate {
     public func tableView(_ tableView: UITableView,
                           heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let rowSize = viewModel?[indexPath.section][indexPath.row].size(constrainedTo: tableView.bounds.size)
+        guard let rowSize = viewModel?[safe: indexPath.section]?[safe: indexPath.row]?.size(constrainedTo: tableView.bounds.size)
         else { return tableView.rowHeight }
 
         return rowSize.height
@@ -20,7 +20,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView,
                           heightForHeaderInSection section: Int) -> CGFloat {
-        guard let headerSize = viewModel?[section].header?.size(constrainedTo: tableView.bounds.size)
+        guard let headerSize = viewModel?[safe: section]?.header?.size(constrainedTo: tableView.bounds.size)
         else { return tableView.sectionHeaderHeight }
 
         return headerSize.height
@@ -28,7 +28,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView,
                           heightForFooterInSection section: Int) -> CGFloat {
-        guard let footerSize = viewModel?[section].footer?.size(constrainedTo: tableView.bounds.size)
+        guard let footerSize = viewModel?[safe: section]?.footer?.size(constrainedTo: tableView.bounds.size)
         else { return tableView.sectionFooterHeight }
 
         return footerSize.height
@@ -36,7 +36,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView,
                           viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = viewModel?[section].header,
+        guard let header = viewModel?[safe: section]?.header,
               let view = tableView.dequeueReusableHeaderFooterView(
                   withIdentifier: String(describing: header.binderType)
               ) else { return nil }
@@ -63,7 +63,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView,
                           viewForFooterInSection section: Int) -> UIView? {
-        guard let footer = viewModel?[section].footer,
+        guard let footer = viewModel?[safe: section]?.footer,
               let view = tableView.dequeueReusableHeaderFooterView(
                   withIdentifier: String(describing: footer.binderType)
               ) else { return nil }
@@ -91,7 +91,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
     public func tableView(_ tableView: UITableView,
                           willDisplay cell: UITableViewCell,
                           forRowAt indexPath: IndexPath) {
-        guard let row = viewModel?[indexPath.section][indexPath.row] else { return }
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row] else { return }
 
         row.willDisplay(to: cell)
     }
@@ -99,7 +99,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
     public func tableView(_ tableView: UITableView,
                           willDisplayHeaderView view: UIView,
                           forSection section: Int) {
-        guard let header = viewModel?[section].header else { return }
+        guard let header = viewModel?[safe: section]?.header else { return }
 
         header.willDisplay(to: view)
     }
@@ -107,7 +107,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
     public func tableView(_ tableView: UITableView,
                           willDisplayFooterView view: UIView,
                           forSection section: Int) {
-        guard let footer = viewModel?[section].footer else { return }
+        guard let footer = viewModel?[safe: section]?.footer else { return }
 
         footer.willDisplay(to: view)
     }
@@ -115,7 +115,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
     public func tableView(_ tableView: UITableView,
                           didEndDisplaying cell: UITableViewCell,
                           forRowAt indexPath: IndexPath) {
-        guard let row = viewModel?[indexPath.section][indexPath.row] else { return }
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row] else { return }
 
         row.didEndDisplaying(to: cell)
     }
@@ -123,7 +123,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
     public func tableView(_ tableView: UITableView,
                           didEndDisplayingHeaderView view: UIView,
                           forSection section: Int) {
-        guard let header = viewModel?[section].header else { return }
+        guard let header = viewModel?[safe: section]?.header else { return }
 
         header.didEndDisplaying(to: view)
     }
@@ -131,14 +131,14 @@ extension SSTableViewPresenter: UITableViewDelegate {
     public func tableView(_ tableView: UITableView,
                           didEndDisplayingFooterView view: UIView,
                           forSection section: Int) {
-        guard let footer = viewModel?[section].footer else { return }
+        guard let footer = viewModel?[safe: section]?.footer else { return }
 
         footer.didEndDisplaying(to: view)
     }
 
     public func tableView(_ tableView: UITableView,
                           didHighlightRowAt indexPath: IndexPath) {
-        guard let row = viewModel?[indexPath.section][indexPath.row],
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
               let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
         else { return }
 
@@ -147,7 +147,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView,
                           didUnhighlightRowAt indexPath: IndexPath) {
-        guard let row = viewModel?[indexPath.section][indexPath.row],
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
               let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
         else { return }
 
@@ -156,7 +156,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView,
                           didSelectRowAt indexPath: IndexPath) {
-        guard let row = viewModel?[indexPath.section][indexPath.row],
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
               let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
         else { return }
 
@@ -165,7 +165,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView,
                           didDeselectRowAt indexPath: IndexPath) {
-        guard let row = viewModel?[indexPath.section][indexPath.row],
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
               let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
         else { return }
 
@@ -175,7 +175,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
     @available(iOS 11.0, *)
     public func tableView(_ tableView: UITableView,
                           leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let row = viewModel?[indexPath.section][indexPath.row],
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
               let swipeConfig = row.leadingSwipeActions?(row)
         else { return nil }
 
@@ -223,7 +223,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
     @available(iOS 11.0, *)
     public func tableView(_ tableView: UITableView,
                           trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let row = viewModel?[indexPath.section][indexPath.row],
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
               let swipeConfig = row.trailingSwipeActions?(row)
         else { return nil }
 

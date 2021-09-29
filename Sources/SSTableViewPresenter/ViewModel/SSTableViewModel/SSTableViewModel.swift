@@ -77,8 +77,8 @@ public struct SSTableViewModel: RandomAccessCollection, RangeReplaceableCollecti
 
     /// Get a section at the specified index.
     public func sectionInfo(at index: Int) -> SectionInfo? {
-        guard sections.indices.contains(index) else { return nil }
-        return sections[index]
+        guard let sectionInfo = sections[safe: index] else { return nil }
+        return sectionInfo
     }
 
     // MARK: - Index Titles

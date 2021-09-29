@@ -141,12 +141,8 @@ public final class SSTableViewPresenter: NSObject {
     ///   - indexPath: The index path of the cell to update.
     internal func reconfigureRow<T>(_ newState: T, at indexPath: IndexPath) {
         guard let tableView = tableView,
-              let viewModel = viewModel,
-              indexPath.section < viewModel.count,
-              indexPath.row < viewModel[indexPath.section].count else { return }
-
-        let row = viewModel[indexPath.section][indexPath.row]
-        guard row.state is T else { return }
+              let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
+              row.state is T else { return }
 
         if let cell = tableView.cellForRow(at: indexPath) {
             row.state = newState
@@ -166,10 +162,7 @@ public final class SSTableViewPresenter: NSObject {
     @available(iOS 9.0, *)
     internal func reconfigureHeader<T>(_ newState: T, at section: Int) {
         guard let tableView = tableView,
-              let viewModel = viewModel,
-              section < viewModel.count else { return }
-
-        guard let header = viewModel[section].header,
+              let header = viewModel?[safe: section]?.header,
               header.state is T else { return }
 
         if let view = tableView.headerView(forSection: section) {
@@ -190,10 +183,7 @@ public final class SSTableViewPresenter: NSObject {
     @available(iOS 9.0, *)
     internal func reconfigureFooter<T>(_ newState: T, at section: Int) {
         guard let tableView = tableView,
-              let viewModel = viewModel,
-              section < viewModel.count else { return }
-
-        guard let footer = viewModel[section].footer,
+              let footer = viewModel?[safe: section]?.footer,
               footer.state is T else { return }
 
         if let view = tableView.footerView(forSection: section) {
