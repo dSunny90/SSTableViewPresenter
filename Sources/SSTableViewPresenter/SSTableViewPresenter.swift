@@ -112,7 +112,7 @@ public final class SSTableViewPresenter: NSObject {
 
     public init(
         tableView: UITableView,
-        actionHandler: ActionHandlingProvider? = nil,
+        actionHandler: (any ActionHandlingProvider)? = nil,
         dataSourceMode: DataSourceMode = .traditional
     ) {
         self.tableView = tableView
@@ -159,7 +159,6 @@ public final class SSTableViewPresenter: NSObject {
     /// - Parameters:
     ///   - newState: The new state to apply to the header view.
     ///   - section: The index of the section whose header to update.
-    @available(iOS 9.0, *)
     internal func reconfigureHeader<T>(_ newState: T, at section: Int) {
         guard let tableView = tableView,
               let header = viewModel?[safe: section]?.header,
@@ -180,7 +179,6 @@ public final class SSTableViewPresenter: NSObject {
     /// - Parameters:
     ///   - newState: The new state to apply to the footer view.
     ///   - section: The index of the section whose footer to update.
-    @available(iOS 9.0, *)
     internal func reconfigureFooter<T>(_ newState: T, at section: Int) {
         guard let tableView = tableView,
               let footer = viewModel?[safe: section]?.footer,

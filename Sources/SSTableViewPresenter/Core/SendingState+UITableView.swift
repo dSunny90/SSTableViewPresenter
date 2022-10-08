@@ -83,7 +83,6 @@ extension SendingState where Base: UITableView {
     /// - Parameters:
     ///   - newState: The new state to apply to the header view.
     ///   - section: The index of the section whose header to update.
-    @available(iOS 9.0, *)
     public func reconfigureHeader<T>(_ newState: T, at section: Int) {
         base.presenter?.reconfigureHeader(newState, at: section)
     }
@@ -93,7 +92,6 @@ extension SendingState where Base: UITableView {
     /// - Parameters:
     ///   - newState: The new state to apply to the footer view.
     ///   - section: The index of the section whose footer to update.
-    @available(iOS 9.0, *)
     public func reconfigureFooter<T>(_ newState: T, at section: Int) {
         base.presenter?.reconfigureFooter(newState, at: section)
     }
@@ -246,7 +244,6 @@ extension SendingState where Base: UITableView {
     ///
     /// - Parameter block: A closure that receives the `CellInfo` for rows
     ///                    to prefetch.
-    @available(iOS 10.0, *)
     public func onPrefetch(_ block: @escaping ([CellInfo]) -> Void) {
         base.presenter?.prefetchBlock = block
     }
@@ -255,7 +252,6 @@ extension SendingState where Base: UITableView {
     ///
     /// - Parameter block: A closure that receives the `CellInfo` for rows
     ///                    whose prefetching should be cancelled.
-    @available(iOS 10.0, *)
     public func onCancelPrefetch(_ block: @escaping ([CellInfo]) -> Void) {
         base.presenter?.cancelPrefetchBlock = block
     }

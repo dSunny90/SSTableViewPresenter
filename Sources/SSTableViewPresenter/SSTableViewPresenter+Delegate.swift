@@ -53,7 +53,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
         }
 
         if let actionHandler = actionHandler,
-           let aView = view as? (UIView & EventSendingProvider)
+           let aView = view as? (UIView & EventForwardingProvider)
         {
             actionHandler.attach(to: aView)
         }
@@ -80,7 +80,7 @@ extension SSTableViewPresenter: UITableViewDelegate {
         }
 
         if let actionHandler = actionHandler,
-           let aView = view as? (UIView & EventSendingProvider)
+           let aView = view as? (UIView & EventForwardingProvider)
         {
             actionHandler.attach(to: aView)
         }
@@ -172,7 +172,6 @@ extension SSTableViewPresenter: UITableViewDelegate {
         row.didDeselect(to: cell)
     }
 
-    @available(iOS 11.0, *)
     public func tableView(_ tableView: UITableView,
                           leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
@@ -220,7 +219,6 @@ extension SSTableViewPresenter: UITableViewDelegate {
         return config
     }
 
-    @available(iOS 11.0, *)
     public func tableView(_ tableView: UITableView,
                           trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],

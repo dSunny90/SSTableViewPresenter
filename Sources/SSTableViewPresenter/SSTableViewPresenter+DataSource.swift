@@ -60,7 +60,7 @@ extension SSTableViewPresenter: UITableViewDataSource {
         }
 
         if let actionHandler = actionHandler,
-           let aCell = cell as? (UIView & EventSendingProvider)
+           let aCell = cell as? (UIView & EventForwardingProvider)
         {
             actionHandler.attach(to: aCell)
         }

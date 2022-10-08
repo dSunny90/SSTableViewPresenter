@@ -2,7 +2,7 @@
 
 🎞️ Super Simple abstraction layer for building `UITableView`-based UIs with minimal boilerplate.
 
-[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager/) ![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg) ![Platform](https://img.shields.io/badge/platform-iOS%208-brightgreen) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager/) ![Swift](https://img.shields.io/badge/Swift-5.7-orange.svg) ![Platform](https://img.shields.io/badge/platform-iOS%2012-brightgreen) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Motivation
 
@@ -27,7 +27,7 @@ Built with a pragmatic take on Apple's MVC architecture:
 - **Diffable & traditional data source support** — Switch modes based on your needs.
 - **Automatic cell/header/footer registration** — Uses type-safe identifiers; NIB files are detected automatically.
 - **Built-in RESTful API pagination** — Tracks `page` and `hasNext`, with seamless next-page requests.
-- **Re-exported dependency** — `SendingState` is re-exported, so you can use `Configurable`, `EventSendingProvider`, and other types without an extra import.
+- **Re-exported dependency** — `SendingState` is re-exported, so you can use `Configurable`, `EventForwardingProvider`, and other types without an extra import.
 
 ## How It Works
 
@@ -146,9 +146,9 @@ builder.header(headerData, viewType: SectionHeaderView.self) { section, view, ac
 
 #### Complex actions with `EventForwarder` (SendingState)
 
-When a cell or view emits multiple event types, carries typed payloads, or needs to share a single event channel across sections, conform to `EventSendingProvider` from `SendingState` instead. Observe events at the view-controller level through the presenter's shared event channel.
+When a cell or view emits multiple event types, carries typed payloads, or needs to share a single event channel across sections, conform to `EventForwardingProvider` from `SendingState` instead. Observe events at the view-controller level through the presenter's shared event channel.
 
-> For full `EventSendingProvider` usage, refer to the [`SendingState`](https://github.com/dSunny90/SendingState) documentation.
+> For full `EventForwardingProvider` usage, refer to the [`SendingState`](https://github.com/dSunny90/SendingState) documentation.
 
 ---
 
@@ -239,7 +239,7 @@ builder.header(headerData, viewType: SectionHeaderView.self) { [weak self] secti
 
 #### Triggering from an `EventForwarder`
 
-When using `EventSendingProvider`, the handler receives no index by default. The view must embed its own position in the forwarded payload so the handler can pass it to `toggleSection`.
+When using `EventForwardingProvider`, the handler receives no index by default. The view must embed its own position in the forwarded payload so the handler can pass it to `toggleSection`.
 
 - **Headers / footers** — include `sectionIndex`
 - **Cells** — include `indexPath`
@@ -399,6 +399,6 @@ https://github.com/dSunny90/SSTableViewPresenter
 ### Using Package.swift:
 ```swift
 dependencies: [
-    .package(url: "https://github.com/dSunny90/SSTableViewPresenter", from: "0.1.0")
+    .package(url: "https://github.com/dSunny90/SSTableViewPresenter", from: "0.2.0")
 ]
 ```

@@ -9,7 +9,6 @@ import UIKit
 
 // MARK: - UITableViewDataSourcePrefetching
 
-@available(iOS 10.0, *)
 extension SSTableViewPresenter: UITableViewDataSourcePrefetching {
     public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
         guard let viewModel = viewModel else { return }
