@@ -137,6 +137,15 @@ extension SSTableViewPresenter: UITableViewDelegate {
     }
 
     public func tableView(_ tableView: UITableView,
+                          shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
+              let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
+        else { return true }
+
+        return row.shouldHighlight(to: cell)
+    }
+
+    public func tableView(_ tableView: UITableView,
                           didHighlightRowAt indexPath: IndexPath) {
         guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
               let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
@@ -155,12 +164,29 @@ extension SSTableViewPresenter: UITableViewDelegate {
     }
 
     public func tableView(_ tableView: UITableView,
+                          willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
+              let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
+        else { return indexPath }
+
+        return row.willSelect(to: cell) ? indexPath : nil
+    }
+
+    public func tableView(_ tableView: UITableView,
                           didSelectRowAt indexPath: IndexPath) {
         guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
               let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
         else { return }
 
         row.didSelect(to: cell)
+    }
+
+    public func tableView(_ tableView: UITableView, willDeselectRowAt indexPath: IndexPath) -> IndexPath? {
+        guard let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row],
+              let cell = tableView.cellForRow(at: IndexPath(row: indexPath.row, section: indexPath.section))
+        else { return indexPath }
+
+        return row.willDeselect(to: cell) ? indexPath : nil
     }
 
     public func tableView(_ tableView: UITableView,
@@ -170,6 +196,21 @@ extension SSTableViewPresenter: UITableViewDelegate {
         else { return }
 
         row.didDeselect(to: cell)
+    }
+
+    @available(iOS 16.0, *)
+    public func tableView(_ tableView: UITableView,
+                          canPerformPrimaryActionForRowAt indexPath: IndexPath) -> Bool {
+        guard let block = performPrimaryActionBlock,
+              let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row] else { return false }
+        return block(indexPath, row) != nil
+    }
+
+    @available(iOS 16.0, *)
+    public func tableView(_ tableView: UITableView, performPrimaryActionForRowAt indexPath: IndexPath) {
+        guard let block = performPrimaryActionBlock,
+              let row = viewModel?[safe: indexPath.section]?[safe: indexPath.row] else { return }
+        block(indexPath, row)?()
     }
 
     public func tableView(_ tableView: UITableView,

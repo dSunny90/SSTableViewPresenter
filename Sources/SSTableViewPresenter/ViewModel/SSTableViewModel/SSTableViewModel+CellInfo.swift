@@ -91,9 +91,12 @@ extension SSTableViewModel {
         /// Closure that returns trailing swipe configuration for a cell
         public var trailingSwipeActions: ((CellInfo) -> SwipeConfiguration)?
 
+        private let _shouldHighlightBlock: (Any) -> Bool
         private let _didHighlightBlock: (Any) -> Void
         private let _didUnhighlightBlock: (Any) -> Void
+        private let _willSelectBlock: (Any) -> Bool
         private let _didSelectBlock: (Any) -> Void
+        private let _willDeselectBlock: (Any) -> Bool
         private let _didDeselectBlock: (Any) -> Void
         private let _willDisplayBlock: (Any) -> Void
         private let _didEndDisplayingBlock: (Any) -> Void
@@ -106,6 +109,10 @@ extension SSTableViewModel {
         public init<State, Binder>(_ store: BindingStore<State, Binder>)
         where Binder: SSTableViewCellProtocol
         {
+            _shouldHighlightBlock = { binder in
+                guard let cell = binder as? Binder else { return true }
+                return cell.shouldHighlight(with: store.state)
+            }
             _didHighlightBlock = { binder in
                 guard let cell = binder as? Binder else { return }
                 cell.didHighlight(with: store.state)
@@ -114,9 +121,17 @@ extension SSTableViewModel {
                 guard let cell = binder as? Binder else { return }
                 cell.didUnhighlight(with: store.state)
             }
+            _willSelectBlock = { binder in
+                guard let cell = binder as? Binder else { return true }
+                return cell.willSelect(with: store.state)
+            }
             _didSelectBlock = { binder in
                 guard let cell = binder as? Binder else { return }
                 cell.didSelect(with: store.state)
+            }
+            _willDeselectBlock = { binder in
+                guard let cell = binder as? Binder else { return true }
+                return cell.willDeselect(with: store.state)
             }
             _didDeselectBlock = { binder in
                 guard let cell = binder as? Binder else { return }
@@ -133,6 +148,12 @@ extension SSTableViewModel {
             super.init(store)
         }
 
+        /// Forwards `tableView(_:shouldHighlightRowAt:)`
+        /// to the binder using the stored row.
+        public func shouldHighlight(to binder: Any) -> Bool {
+            return _shouldHighlightBlock(binder)
+        }
+
         /// Forwards `tableView(_:didHighlightRowAt:)`
         /// to the binder using the stored row.
         public func didHighlight(to binder: Any) {
@@ -147,11 +168,23 @@ extension SSTableViewModel {
             isHighlighted = false
         }
 
+        /// Forwards `tableView(_:willSelectRowAt:)`
+        /// to the binder using the stored row.
+        public func willSelect(to binder: Any) -> Bool {
+            return _willSelectBlock(binder)
+        }
+
         /// Forwards `tableView(_:didSelectRowAt:)`
         /// to the binder using the stored row.
         public func didSelect(to binder: Any) {
             isSelected = true
             _didSelectBlock(binder)
+        }
+
+        /// Forwards `tableView(_:willDeselectRowAt:)`
+        /// to the binder using the stored row.
+        public func willDeselect(to binder: Any) -> Bool {
+            return _willDeselectBlock(binder)
         }
 
         /// Forwards `tableView(_:didDeselectRowAt:)`
