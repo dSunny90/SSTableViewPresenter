@@ -399,6 +399,6 @@ https://github.com/dSunny90/SSTableViewPresenter
 ### Using Package.swift:
 ```swift
 dependencies: [
-    .package(url: "https://github.com/dSunny90/SSTableViewPresenter", from: "0.2.1")
+    .package(url: "https://github.com/dSunny90/SSTableViewPresenter", from: "0.2.2")
 ]
 ```
