@@ -110,6 +110,47 @@ public final class SSTableViewPresenter: NSObject {
     // MARK: - Row Insertion
     internal var newCellInfoProvider: ((IndexPath) -> CellInfo)?
 
+    // MARK: - Reorder
+
+    /// Whether drag & drop reordering is enabled.
+    internal var isReorderEnabled: Bool = false
+
+    /// Determines if a specific row can be dragged. Defaults to `true` if nil.
+    internal var canDragRowBlock: ((CellInfo) -> Bool)?
+
+    /// Called with the rows about to move, before the data source is updated.
+    internal var willReorderBlock: (([(indexPath: IndexPath, cellInfo: CellInfo)]) -> Void)?
+
+    /// Called after the data source is updated with the moved rows and destination.
+    internal var didReorderBlock: (([(indexPath: IndexPath, cellInfo: CellInfo)], IndexPath) -> Void)?
+
+    /// Provides custom `UIDragPreviewParameters` for a dragged row.
+    internal var dragPreviewParametersBlock: ((IndexPath) -> UIDragPreviewParameters?)?
+
+    /// Provides a custom preview view for a dragged row. Returns nil for default.
+    internal var dragPreviewProviderBlock: ((CellInfo) -> UIView?)?
+
+    // MARK: - External Drag & Drop Handlers (iPad)
+
+    /// Whether external drag & drop is enabled.
+    ///
+    /// When enabled, rows can be dragged out to or dropped in from
+    /// other apps on iPad.
+    internal var isExternalDragDropEnabled: Bool = false
+
+    /// Optional provider to build an NSItemProvider
+    /// for a given cell & cell info when a drag begins.
+    internal var dragItemProviderBlock: ((UITableViewCell, CellInfo) -> NSItemProvider?)?
+
+    /// UTType identifiers accepted for external drops.
+    /// Only drop sessions advertising a matching type are forwarded to
+    /// `externalDropHandler`.
+    internal var acceptedExternalDropTypeIdentifiers: [String] = []
+
+    /// Converts an externally dropped value into a `CellInfo` at the
+    /// destination index path. Return `nil` to reject the drop.
+    internal var externalDropHandler: ((Any?, IndexPath) -> CellInfo?)?
+
     // MARK: - Table View Reference
 
     /// The table view being managed by this presenter.
@@ -293,6 +334,26 @@ public final class SSTableViewPresenter: NSObject {
             } else {
                 assertionFailure("Diffable is not supported below iOS 13.")
             }
+        }
+    }
+
+    // MARK: - Drag&Drop Configuration
+
+    /// Configures drag & drop on the table view.
+    ///
+    /// When either `isReorderEnabled` or `isExternalDragDropEnabled` is
+    /// `true`, sets `dragInteractionEnabled = true` and assigns the
+    /// presenter as both `dragDelegate` and `dropDelegate`.
+    internal func configureDragDrop() {
+        guard let tableView = tableView else { return }
+        if isReorderEnabled || isExternalDragDropEnabled {
+            tableView.dragInteractionEnabled = true
+            tableView.dragDelegate = self
+            tableView.dropDelegate = self
+        } else {
+            tableView.dragInteractionEnabled = false
+            tableView.dragDelegate = nil
+            tableView.dropDelegate = nil
         }
     }
 

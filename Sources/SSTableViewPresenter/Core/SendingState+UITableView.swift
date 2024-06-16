@@ -256,6 +256,136 @@ extension SendingState where Base: UITableView {
         base.presenter?.cancelPrefetchBlock = block
     }
 
+    // MARK: - Reorder
+
+    /// Enables or disables drag & drop reordering.
+    ///
+    /// When enabled, rows can be reordered by long-pressing and dragging
+    /// within the same table view.
+    ///
+    /// - Parameter enabled: Pass `true` to enable, `false` to disable.
+    public func setReorderEnabled(_ enabled: Bool) {
+        base.presenter?.isReorderEnabled = enabled
+        base.presenter?.configureDragDrop()
+    }
+
+    /// Sets a closure to determine whether a specific row can be dragged.
+    ///
+    /// Return `false` to prevent dragging that row. If not set, all rows
+    /// are draggable by default.
+    ///
+    /// - Parameter block: A closure receiving the row's `CellInfo`.
+    ///   Return `true` to allow dragging, `false` to prevent it.
+    public func onCanDragRow(
+        _ block: @escaping ((CellInfo) -> Bool)
+    ) {
+        base.presenter?.canDragRowBlock = block
+    }
+
+    /// Sets a closure called right before a reorder is applied.
+    ///
+    /// Use this to observe which rows are about to move.
+    ///
+    /// - Parameter block: A closure receiving an array of
+    ///   `(indexPath:cellInfo:)` tuples for the rows being moved.
+    public func onWillReorder(
+        _ block: @escaping (([(indexPath: IndexPath, cellInfo: CellInfo)]) -> Void)
+    ) {
+        base.presenter?.willReorderBlock = block
+    }
+
+    /// Sets a closure called after a reorder transaction completes.
+    ///
+    /// Provides the reordered rows and the final destination index path
+    /// of the first moved row.
+    ///
+    /// - Parameter block: A closure receiving an array of
+    ///   `(indexPath:cellInfo:)` tuples and the destination `IndexPath`.
+    public func onDidReorder(
+        _ block: @escaping (([(indexPath: IndexPath, cellInfo: CellInfo)], IndexPath) -> Void)
+    ) {
+        base.presenter?.didReorderBlock = block
+    }
+
+    /// Sets a custom drag preview parameters provider.
+    ///
+    /// - Parameter block: Receives the index path and returns
+    ///   `UIDragPreviewParameters`, or `nil` for default behavior.
+    public func onDragPreviewParameters(
+        _ block: @escaping (IndexPath) -> UIDragPreviewParameters?
+    ) {
+        base.presenter?.dragPreviewParametersBlock = block
+    }
+
+    /// Sets a closure that provides a custom drag preview view for a row.
+    ///
+    /// The closure receives the row's `CellInfo` and returns a `UIView` to use
+    /// as the drag preview. Return `nil` to use the default cell snapshot.
+    ///
+    /// - Parameter block: A closure called when a drag preview is needed.
+    ///   - cellInfo: The ``SSTableViewModel/CellInfo`` of the row being dragged.
+    ///   - returns: A custom `UIView` for the preview, or `nil` for the default.
+    public func setDragPreviewProvider(_ block: @escaping (CellInfo) -> UIView?) {
+        base.presenter?.dragPreviewProviderBlock = block
+    }
+
+    // MARK: - External Drag & Drop Handlers (iPad)
+
+    /// Enables or disables external drag & drop.
+    ///
+    /// When enabled, rows can be dragged out to or dropped in from other apps.
+    /// This feature is intended for iPad, where multi-window
+    /// and inter-app drag & drop are supported.
+    ///
+    /// - Parameter enabled: Pass `true` to enable, `false` to disable.
+    public func setExternalDragDropEnabled(_ enabled: Bool) {
+        base.presenter?.isExternalDragDropEnabled = enabled
+        base.presenter?.configureDragDrop()
+    }
+
+    /// Sets a custom item provider for drag operations.
+    ///
+    /// Use this to supply an `NSItemProvider` for external drops, such as
+    /// dragging rows into another app. Return `nil` to fall back to the
+    /// default provider.
+    ///
+    /// - Parameter block: A closure called when a drag begins.
+    ///   - cell: The visible `UITableViewCell` for the dragged row.
+    ///   - cellInfo: The ``SSTableViewModel/CellInfo`` of the dragged row.
+    ///   - returns: An `NSItemProvider` for external payloads, or `nil` for
+    ///     the default behavior.
+    public func setDragItemProvider(
+        _ block: @escaping (UITableViewCell, CellInfo) -> NSItemProvider?
+    ) {
+        base.presenter?.dragItemProviderBlock = block
+    }
+
+    /// Sets the UTType identifiers accepted for external drops.
+    ///
+    /// Only drop sessions advertising a matching type are forwarded to
+    /// the handler registered with ``onExternalDrop(_:)``.
+    ///
+    /// - Parameter typeIdentifiers: An array of UTType identifier strings
+    ///   (e.g. `[UTType.plainText.identifier]`).
+    public func setAcceptedExternalDropTypeIdentifiers(
+        _ typeIdentifiers: [String]
+    ) {
+        base.presenter?.acceptedExternalDropTypeIdentifiers = typeIdentifiers
+    }
+
+    /// Sets a handler to convert an externally dropped value into a cell.
+    ///
+    /// Called when a drop originates outside the table view. Return `nil`
+    /// to reject the drop.
+    ///
+    /// - Parameter block: A closure called when an external drop is received.
+    ///   - value: The dropped value. Cast to the expected type as needed.
+    ///   - indexPath: The destination `IndexPath` of the drop.
+    ///   - returns: A ``SSTableViewModel/CellInfo`` to insert, or `nil` to reject.
+    public func onExternalDrop(_ block: @escaping (Any?, IndexPath) -> CellInfo?) {
+        base.presenter?.externalDropHandler = block
+    }
+
     // MARK: - Snapshot Application (iOS 13+)
 
     /// Applies the current diffable data source snapshot.
