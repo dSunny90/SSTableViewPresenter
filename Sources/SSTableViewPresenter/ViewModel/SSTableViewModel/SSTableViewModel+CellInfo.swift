@@ -12,7 +12,7 @@ extension SSTableViewModel {
     /// A type-erased container that holds information for a single cell,
     /// used by `SSTableViewPresenter` to configure and render cells
     /// in the table view.
-    public final class CellInfo: AnyBindingStore {
+    public final class CellInfo: AnyBindingStore, @unchecked Sendable {
         /// Swipe action shown on leading/trailing side of a row.
         public struct SwipeAction {
             /// Visual style (.normal / .destructive).
@@ -91,15 +91,15 @@ extension SSTableViewModel {
         /// Closure that returns trailing swipe configuration for a cell
         public var trailingSwipeActions: ((CellInfo) -> SwipeConfiguration)?
 
-        private let _shouldHighlightBlock: (Any) -> Bool
-        private let _didHighlightBlock: (Any) -> Void
-        private let _didUnhighlightBlock: (Any) -> Void
-        private let _willSelectBlock: (Any) -> Bool
-        private let _didSelectBlock: (Any) -> Void
-        private let _willDeselectBlock: (Any) -> Bool
-        private let _didDeselectBlock: (Any) -> Void
-        private let _willDisplayBlock: (Any) -> Void
-        private let _didEndDisplayingBlock: (Any) -> Void
+        private let _shouldHighlightBlock: @MainActor (Any) -> Bool
+        private let _didHighlightBlock: @MainActor (Any) -> Void
+        private let _didUnhighlightBlock: @MainActor (Any) -> Void
+        private let _willSelectBlock: @MainActor (Any) -> Bool
+        private let _didSelectBlock: @MainActor (Any) -> Void
+        private let _willDeselectBlock: @MainActor (Any) -> Bool
+        private let _didDeselectBlock: @MainActor (Any) -> Void
+        private let _willDisplayBlock: @MainActor (Any) -> Void
+        private let _didEndDisplayingBlock: @MainActor (Any) -> Void
 
         /// Creates a type-erased wrapper for a cell binding store.
         ///
@@ -150,12 +150,14 @@ extension SSTableViewModel {
 
         /// Forwards `tableView(_:shouldHighlightRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func shouldHighlight(to binder: Any) -> Bool {
             return _shouldHighlightBlock(binder)
         }
 
         /// Forwards `tableView(_:didHighlightRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func didHighlight(to binder: Any) {
             _didHighlightBlock(binder)
             isHighlighted = true
@@ -163,6 +165,7 @@ extension SSTableViewModel {
 
         /// Forwards `tableView(_:didUnhighlightRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func didUnhighlight(to binder: Any) {
             _didUnhighlightBlock(binder)
             isHighlighted = false
@@ -170,12 +173,14 @@ extension SSTableViewModel {
 
         /// Forwards `tableView(_:willSelectRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func willSelect(to binder: Any) -> Bool {
             return _willSelectBlock(binder)
         }
 
         /// Forwards `tableView(_:didSelectRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func didSelect(to binder: Any) {
             isSelected = true
             _didSelectBlock(binder)
@@ -183,12 +188,14 @@ extension SSTableViewModel {
 
         /// Forwards `tableView(_:willDeselectRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func willDeselect(to binder: Any) -> Bool {
             return _willDeselectBlock(binder)
         }
 
         /// Forwards `tableView(_:didDeselectRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func didDeselect(to binder: Any) {
             isSelected = false
             _didDeselectBlock(binder)
@@ -196,12 +203,14 @@ extension SSTableViewModel {
 
         /// Forwards `tableView(_:willDisplay:forRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func willDisplay(to binder: Any) {
             _willDisplayBlock(binder)
         }
 
         /// Forwards `tableView(_:didEndDisplaying:forRowAt:)`
         /// to the binder using the stored row.
+        @MainActor
         public func didEndDisplaying(to binder: Any) {
             _didEndDisplayingBlock(binder)
         }

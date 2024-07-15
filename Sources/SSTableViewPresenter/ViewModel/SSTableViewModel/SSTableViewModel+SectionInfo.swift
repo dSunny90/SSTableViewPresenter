@@ -11,7 +11,7 @@ extension SSTableViewModel {
     // MARK: - SSTableViewModel.SectionInfo
     /// A view model structure used by `SSTableViewPresenter` to configure
     /// and render each section of the table view.
-    public struct SectionInfo: RandomAccessCollection, RangeReplaceableCollection, Hashable {
+    public struct SectionInfo: RandomAccessCollection, RangeReplaceableCollection, Hashable, Sendable {
         public typealias HeaderFooterViewInfo = SSTableViewModel.HeaderFooterViewInfo
 
         private let uuid: UUID = UUID()

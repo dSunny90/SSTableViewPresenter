@@ -12,7 +12,7 @@ extension SSTableViewModel {
     /// A type-erased container that holds information for headerFooterViews,
     /// used by `SSTableViewPresenter` to configure and render header/footer
     /// views in the table view.
-    public final class HeaderFooterViewInfo: AnyBindingStore {
+    public final class HeaderFooterViewInfo: AnyBindingStore, @unchecked Sendable {
         /// A closure invoked when the bound view sends an action.
         ///
         /// - Parameters:
@@ -22,8 +22,8 @@ extension SSTableViewModel {
         ///   - input: An optional value passed by the caller for the action.
         public var actionClosure: ((Int, UITableViewHeaderFooterView, String, Any?) -> Void)?
 
-        private let _willDisplayBlock: (Any) -> Void
-        private let _didEndDisplayingBlock: (Any) -> Void
+        private let _willDisplayBlock: @MainActor (Any) -> Void
+        private let _didEndDisplayingBlock: @MainActor (Any) -> Void
 
         /// Creates a type-erased wrapper for a header/footer view binding store.
         ///
@@ -47,11 +47,13 @@ extension SSTableViewModel {
         /// Forwards `tableView(_:willDisplayHeaderView:forSection:)`/
         /// `tableView(_:willDisplayFooterView:forSection:)`
         /// to the binder using the stored row.
+        @MainActor
         public func willDisplay(to binder: Any) { _willDisplayBlock(binder) }
 
         /// Forwards `tableView(_:didEndDisplayingHeaderView:forSection:)`/
         /// `tableView(_:didEndDisplayingFooterView:forSection:)`
         /// to the binder using the stored row.
+        @MainActor
         public func didEndDisplaying(to binder: Any) { _didEndDisplayingBlock(binder) }
     }
 }

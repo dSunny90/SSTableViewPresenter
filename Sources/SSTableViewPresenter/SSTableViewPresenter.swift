@@ -13,6 +13,7 @@ import UIKit
 /// `SSTableViewPresenter` bridges your view model with the table view,
 /// automatically handling data source and delegate methods. It provides an
 /// easy way to bind cell and header/footer view data with minimal boilerplate.
+@MainActor
 public final class SSTableViewPresenter: NSObject {
     typealias SectionInfo = SSTableViewModel.SectionInfo
     typealias CellInfo = SSTableViewModel.CellInfo

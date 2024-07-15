@@ -9,6 +9,7 @@ import UIKit
 
 @_exported import SendingState
 
+@MainActor
 extension SendingState where Base: UITableView {
     public typealias Builder = SSTableViewModel.Builder
     public typealias SectionInfo = SSTableViewModel.SectionInfo

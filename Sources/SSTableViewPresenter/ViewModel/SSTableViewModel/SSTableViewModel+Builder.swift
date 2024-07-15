@@ -138,15 +138,22 @@ extension SSTableViewModel {
         public func sections(
             _ sectionList: [any SectionRepresentable],
             configureSection: ((_ section: any SectionRepresentable, _ builder: Builder) -> Void)? = nil,
-            configureUnit: @escaping (_ unit: any UnitRepresentable, _ builder: Builder) -> Void
+            configureUnit: (_ unit: any UnitRepresentable, _ builder: Builder) -> Void
         ) -> Self {
             for section in sectionList {
-                self.section(section.sectionId) {
-                    configureSection?(section, self)
-                    for unit in section.units {
-                        configureUnit(unit, self)
-                    }
+                closeCurrentSectionIfNeeded()
+                currentSectionID = section.sectionId ?? UUID().uuidString
+                currentRows.removeAll(keepingCapacity: true)
+                currentHeader = nil
+                currentFooter = nil
+                currentIndexTitle = nil
+                hasOpenSection = true
+
+                configureSection?(section, self)
+                for unit in section.units {
+                    configureUnit(unit, self)
                 }
+                closeCurrentSectionIfNeeded()
             }
             return self
         }

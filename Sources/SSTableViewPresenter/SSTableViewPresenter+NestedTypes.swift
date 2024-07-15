@@ -41,6 +41,7 @@ extension SSTableViewPresenter {
     /// `UITableViewDiffableDataSource.apply` uses the main queue internally,
     /// but snapshot construction is performed synchronously.
     @available(iOS 13.0, *)
+    @MainActor
     internal class DiffableSupportCore {
         /// The `UITableViewDiffableDataSource` instance.
         ///

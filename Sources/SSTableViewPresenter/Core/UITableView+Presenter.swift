@@ -9,9 +9,9 @@ import UIKit
 
 extension UITableView {
     private struct AssociatedKeys {
-        static var registeredCellIdentifiers: UInt8 = 0
-        static var registeredHeaderFooterIdentifiers: UInt8 = 0
-        static var presenter: UInt8 = 0
+        nonisolated(unsafe) static var registeredCellIdentifiers: UInt8 = 0
+        nonisolated(unsafe) static var registeredHeaderFooterIdentifiers: UInt8 = 0
+        nonisolated(unsafe) static var presenter: UInt8 = 0
     }
 
     public var registeredCellIdentifiers: Set<String> {
